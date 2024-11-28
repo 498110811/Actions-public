@@ -50,12 +50,20 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b master openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+         COMMIT_AUTHOR=$(git show -s --date=short --format="作者: %an")
+        echo "COMMIT_AUTHOR=$COMMIT_AUTHOR" >> $GITHUB_ENV
+        COMMIT_DATE=$(git show -s --date=short --format="时间: %ci")
+        echo "COMMIT_DATE=$COMMIT_DATE" >> $GITHUB_ENV
+        COMMIT_MESSAGE=$(git show -s --date=short --format="内容: %s")
+        echo "COMMIT_MESSAGE=$COMMIT_MESSAGE" >> $GITHUB_ENV
+        COMMIT_HASH=$(git show -s --date=short --format="hash: %H")
+        echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
 
     - name: 加载自定义订阅源
       run: |
         chmod +x $DIY_P1_SH
         cd openwrt
-        git checkout fac34a2dfe4e416c3d09e060503c671c9e8efe30
+        #git checkout fac34a2dfe4e416c3d09e060503c671c9e8efe30
         $GITHUB_WORKSPACE/$DIY_P1_SH
 
     - name: 更新feeds订阅源
@@ -105,6 +113,7 @@ jobs:
         ls -l
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
 
     - name: 上传/bin/targets目录中的产物至 Actions 下载页
       uses: actions/upload-artifact@main
@@ -131,5 +140,20 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release_notes.txt
+        body: |
+          **This is OpenWrt Firmware for Rockchip**
+          ### 📒 固件信息
+          - 💻 平台架构: rockchip-armv8 (rk35xx)（Cyber 3588AIB）
+          - ⚽ 固件源码: ${{ env.REPO_URL }}
+          - 💝 源码分支: master
+          - 🚀 内核版本: ${{ env.KERNEL }}
+          - 🌐 默认地址: 192.168.1.1
+          - 🔑 默认密码: password
+          ### 🧊 固件版本
+          - 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录
+          - ${{ env.COMMIT_AUTHOR }}
+          - ${{ env.COMMIT_DATE }}
+          - ${{ env.COMMIT_MESSAGE }}
+          - ${{ env.COMMIT_HASH }}
+        #body_path: release_notes.txt
         files: ${{ env.FIRMWARE }}/*
