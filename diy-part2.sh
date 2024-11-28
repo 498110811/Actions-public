@@ -56,6 +56,10 @@ sed -i '/set wireless.radio${devidx}.disabled=0/a\\t\t\tset wireless.radio${devi
 # 删除ipv6前缀
 #sed -i 's/auto//' package/base-files/files/bin/config_generate
 
+# 在线用户
+sed -i '$i uci set nlbwmon.@nlbwmon[0].refresh_interval=2s' package/lean/default-settings/files/zzz-default-settings
+sed -i '$i uci commit nlbwmon' package/lean/default-settings/files/zzz-default-settings
+chmod 755 package/luci-app-onliner/root/usr/share/onliner/setnlbw.sh
 
 # 移除要替换的包
 #rm -rf feeds/packages/net/mosdns
