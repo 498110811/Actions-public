@@ -3,10 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: 0 18 * * *
-    inputs:
-      release_notes:
-        description: '此处输入release发行说明:'
-        default: '用户未填写'
+    
 # coolsnowwolf
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
