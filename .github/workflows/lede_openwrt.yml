@@ -1,6 +1,8 @@
 name: 编译lede源码
 on:
   workflow_dispatch:
+  schedule:
+    - cron: 0 18 * * *
     inputs:
       release_notes:
         description: '此处输入release发行说明:'
